@@ -98,7 +98,7 @@ TEST(ObservableTest, CheckExpectationValue) {
 /*
 TEST(ObservableTest, CheckParsedObservableFromOpenFermionFile) {
     auto func = [](const std::string path,
-                    const QuantumStateBase* state) -> CPPCTYPE {
+                    const StateVectorBase* state) -> CPPCTYPE {
         std::ifstream ifs;
         ifs.open(path);
         if (!ifs) {
@@ -165,7 +165,7 @@ TEST(ObservableTest, CheckParsedObservableFromOpenFermionFile) {
 
 TEST(ObservableTest, CheckParsedObservableFromOpenFermionText) {
     auto func = [](const std::string str,
-                    const QuantumStateBase* state) -> CPPCTYPE {
+                    const StateVectorBase* state) -> CPPCTYPE {
         CPPCTYPE energy = 0;
 
         std::vector<std::string> lines = split(str, "\n");
@@ -236,7 +236,7 @@ TEST(ObservableTest, CheckParsedObservableFromOpenFermionText) {
 
 TEST(ObservableTest, CheckSplitObservable) {
     auto func = [](const std::string path,
-                    const QuantumStateBase* state) -> CPPCTYPE {
+                    const StateVectorBase* state) -> CPPCTYPE {
         std::ifstream ifs;
         CPPCTYPE coef;
         ifs.open(path);

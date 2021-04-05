@@ -580,8 +580,7 @@ public:
     }
 };
 
-typedef StateVectorCpu
-    StateVector; /**< StateVector is an alias of StateVectorCpu */
+using StateVector = StateVectorCpu;
 
 namespace state {
 /**
