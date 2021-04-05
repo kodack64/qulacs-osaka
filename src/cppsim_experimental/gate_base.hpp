@@ -27,7 +27,7 @@
 #include <cppsim_experimental/state.hpp>
 #include <cppsim_experimental/type.hpp>
 
-enum MapType {
+enum class MapType {
     Basic,
     Sequence,
     Probabilistic,
@@ -35,7 +35,7 @@ enum MapType {
     Instrument,
 };
 
-enum GateMatrixType {
+enum class GateMatrixType {
     DenseMatrix,
     DiagonalMatrix,
     SparseMatrix,
@@ -43,7 +43,7 @@ enum GateMatrixType {
     PermutationMatrix
 };
 
-enum SpecialFuncType {
+enum class SpecialFuncType {
     None,
     GateI,
     GateX,

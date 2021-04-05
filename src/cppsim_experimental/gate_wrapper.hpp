@@ -125,7 +125,7 @@ public:
     static QuantumGateWrapped* ProbabilisticGate(
         std::vector<QuantumGateBase*> gates, const std::vector<double>& prob,
         bool take_ownership = false) {
-        auto ptr = new QuantumGateWrapped(Probabilistic);
+        auto ptr = new QuantumGateWrapped(MapType::Probabilistic);
         ptr->_prob_list.clear();
         ptr->_prob_cum_list.clear();
         ptr->_prob_cum_list.push_back(0.);
@@ -164,7 +164,7 @@ public:
         return "WrappedGate (TODO)";
     }
     virtual void update_quantum_state(QuantumStateBase* state) override {
-        if (_map_type == Probabilistic) {
+        if (_map_type == MapType::Probabilistic) {
             if (state->is_state_vector()) {
                 double r = random_state.uniform();
                 auto ite = std::lower_bound(

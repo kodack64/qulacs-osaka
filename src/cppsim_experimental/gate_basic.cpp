@@ -3,55 +3,55 @@
 
 void QuantumGateBasic::_update_state_vector_cpu_special(
     QuantumStateBase* state) const {
-    if (_special_func_type == GateI) {
+    if (_special_func_type == SpecialFuncType::GateI) {
         // pass
-    } else if (_special_func_type == GateX) {
+    } else if (_special_func_type == SpecialFuncType::GateX) {
         X_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateY) {
+    } else if (_special_func_type == SpecialFuncType::GateY) {
         Y_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateZ) {
+    } else if (_special_func_type == SpecialFuncType::GateZ) {
         Z_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateSqrtX) {
+    } else if (_special_func_type == SpecialFuncType::GateSqrtX) {
         sqrtX_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateSqrtXdag) {
+    } else if (_special_func_type == SpecialFuncType::GateSqrtXdag) {
         sqrtXdag_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateSqrtY) {
+    } else if (_special_func_type == SpecialFuncType::GateSqrtY) {
         sqrtY_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateSqrtYdag) {
+    } else if (_special_func_type == SpecialFuncType::GateSqrtYdag) {
         sqrtYdag_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateH) {
+    } else if (_special_func_type == SpecialFuncType::GateH) {
         H_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateS) {
+    } else if (_special_func_type == SpecialFuncType::GateS) {
         S_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateSdag) {
+    } else if (_special_func_type == SpecialFuncType::GateSdag) {
         Sdag_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateT) {
+    } else if (_special_func_type == SpecialFuncType::GateT) {
         T_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateTdag) {
+    } else if (_special_func_type == SpecialFuncType::GateTdag) {
         Tdag_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateP0) {
+    } else if (_special_func_type == SpecialFuncType::GateP0) {
         P0_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateP1) {
+    } else if (_special_func_type == SpecialFuncType::GateP1) {
         P1_gate(_target_qubit_index[0], state->data_c(), state->dim);
-    } else if (_special_func_type == GateRX) {
+    } else if (_special_func_type == SpecialFuncType::GateRX) {
         // invert
         RX_gate(_target_qubit_index[0], -_rotation_angle, state->data_c(),
             state->dim);
-    } else if (_special_func_type == GateRY) {
+    } else if (_special_func_type == SpecialFuncType::GateRY) {
         // invert
         RY_gate(_target_qubit_index[0], -_rotation_angle, state->data_c(),
             state->dim);
-    } else if (_special_func_type == GateRZ) {
+    } else if (_special_func_type == SpecialFuncType::GateRZ) {
         // invert
         RZ_gate(_target_qubit_index[0], -_rotation_angle, state->data_c(),
             state->dim);
-    } else if (_special_func_type == GateCX) {
+    } else if (_special_func_type == SpecialFuncType::GateCX) {
         CNOT_gate(_control_qubit_index[0], _target_qubit_index[0],
             state->data_c(), state->dim);
-    } else if (_special_func_type == GateCZ) {
+    } else if (_special_func_type == SpecialFuncType::GateCZ) {
         CZ_gate(_control_qubit_index[0], _target_qubit_index[0],
             state->data_c(), state->dim);
-    } else if (_special_func_type == GateSWAP) {
+    } else if (_special_func_type == SpecialFuncType::GateSWAP) {
         SWAP_gate(_target_qubit_index[0], _target_qubit_index[1],
             state->data_c(), state->dim);
     } else {
@@ -61,7 +61,7 @@ void QuantumGateBasic::_update_state_vector_cpu_special(
 
 void QuantumGateBasic::_update_state_vector_cpu_general(
     QuantumStateBase* state) const {
-    if (_matrix_type == DenseMatrix) {
+    if (_matrix_type == GateMatrixType::DenseMatrix) {
         const CTYPE* matrix_ptr =
             reinterpret_cast<const CTYPE*>(this->_dense_matrix_element.data());
         // single qubit dense matrix gate
@@ -113,7 +113,7 @@ void QuantumGateBasic::_update_state_vector_cpu_general(
                     state->data_c(), state->dim);
             }
         }
-    } else if (_matrix_type == DiagonalMatrix) {
+    } else if (_matrix_type == GateMatrixType::DiagonalMatrix) {
         const CTYPE* matrix_ptr = reinterpret_cast<const CTYPE*>(
             this->_diagonal_matrix_element.data());
         if (_target_qubit_index.size() == 1)
@@ -123,11 +123,11 @@ void QuantumGateBasic::_update_state_vector_cpu_general(
             multi_qubit_diagonal_matrix_gate(_target_qubit_index.data(),
                 (UINT)_target_qubit_index.size(), matrix_ptr, state->data_c(),
                 state->dim);
-    } else if (_matrix_type == SparseMatrix) {
+    } else if (_matrix_type == GateMatrixType::SparseMatrix) {
         multi_qubit_sparse_matrix_gate_eigen(_target_qubit_index.data(),
             (UINT)(_target_qubit_index.size()), this->_sparse_matrix_element,
             state->data_c(), state->dim);
-    } else if (_matrix_type == PauliMatrix) {
+    } else if (_matrix_type == GateMatrixType::PauliMatrix) {
         if (_target_qubit_index.size() == 1) {
             if (fabs(_rotation_angle) < 1e-16) {
                 single_qubit_Pauli_gate(_target_qubit_index[0], _pauli_id[0],
@@ -156,7 +156,7 @@ void QuantumGateBasic::_update_state_vector_cpu_general(
 
 void QuantumGateBasic::_update_density_matrix_cpu_general(
     QuantumStateBase* state) const {
-    if (_matrix_type == DenseMatrix) {
+    if (_matrix_type == GateMatrixType::DenseMatrix) {
         const CTYPE* matrix_ptr =
             reinterpret_cast<const CTYPE*>(this->_dense_matrix_element.data());
         if (_control_qubit_index.size() == 0) {
@@ -267,7 +267,7 @@ DllExport QuantumGateBasic* Identity(UINT target_qubit) {
     ComplexMatrix mat = ComplexMatrix::Identity(2, 2);
     auto ptr = QuantumGateBasic::DenseMatrixGate({target_qubit}, mat,
         {FLAG_COMMUTE_X | FLAG_COMMUTE_Y | FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateI);
+    ptr->_set_special_func_type(SpecialFuncType::GateI);
     return ptr;
 }
 DllExport QuantumGateBasic* X(UINT target_qubit) {
@@ -275,7 +275,7 @@ DllExport QuantumGateBasic* X(UINT target_qubit) {
     mat << 0, 1, 1, 0;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_X});
-    ptr->_set_special_func_type(GateX);
+    ptr->_set_special_func_type(SpecialFuncType::GateX);
     return ptr;
 }
 DllExport QuantumGateBasic* Y(UINT target_qubit) {
@@ -283,7 +283,7 @@ DllExport QuantumGateBasic* Y(UINT target_qubit) {
     mat << 0, -1.i, 1.i, 0;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Y});
-    ptr->_set_special_func_type(GateY);
+    ptr->_set_special_func_type(SpecialFuncType::GateY);
     return ptr;
 }
 DllExport QuantumGateBasic* Z(UINT target_qubit) {
@@ -291,7 +291,7 @@ DllExport QuantumGateBasic* Z(UINT target_qubit) {
     mat << 1, 0, 0, -1;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateZ);
+    ptr->_set_special_func_type(SpecialFuncType::GateZ);
     return ptr;
 }
 DllExport QuantumGateBasic* sqrtX(UINT target_qubit) {
@@ -299,7 +299,7 @@ DllExport QuantumGateBasic* sqrtX(UINT target_qubit) {
     mat << 0.5 + 0.5i, 0.5 - 0.5i, 0.5 - 0.5i, 0.5 + 0.5i;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_X});
-    ptr->_set_special_func_type(GateSqrtX);
+    ptr->_set_special_func_type(SpecialFuncType::GateSqrtX);
     return ptr;
 }
 DllExport QuantumGateBasic* sqrtXdag(UINT target_qubit) {
@@ -307,7 +307,7 @@ DllExport QuantumGateBasic* sqrtXdag(UINT target_qubit) {
     mat << 0.5 + 0.5i, 0.5 - 0.5i, 0.5 - 0.5i, 0.5 + 0.5i;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat.adjoint(), {FLAG_COMMUTE_X});
-    ptr->_set_special_func_type(GateSqrtXdag);
+    ptr->_set_special_func_type(SpecialFuncType::GateSqrtXdag);
     return ptr;
 }
 DllExport QuantumGateBasic* sqrtY(UINT target_qubit) {
@@ -315,7 +315,7 @@ DllExport QuantumGateBasic* sqrtY(UINT target_qubit) {
     mat << 0.5 + 0.5i, -0.5 - 0.5i, 0.5 + 0.5i, 0.5 + 0.5i;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Y});
-    ptr->_set_special_func_type(GateSqrtY);
+    ptr->_set_special_func_type(SpecialFuncType::GateSqrtY);
     return ptr;
 }
 DllExport QuantumGateBasic* sqrtYdag(UINT target_qubit) {
@@ -323,25 +323,25 @@ DllExport QuantumGateBasic* sqrtYdag(UINT target_qubit) {
     mat << 0.5 + 0.5i, -0.5 - 0.5i, 0.5 + 0.5i, 0.5 + 0.5i;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat.adjoint(), {FLAG_COMMUTE_Y});
-    ptr->_set_special_func_type(GateSqrtYdag);
+    ptr->_set_special_func_type(SpecialFuncType::GateSqrtYdag);
     return ptr;
 }
 DllExport QuantumGateBasic* RX(UINT target_qubit, double rotation_angle) {
     auto ptr = QuantumGateBasic::PauliMatrixGate(
         {target_qubit}, {PAULI_ID_X}, rotation_angle);
-    ptr->_set_special_func_type(GateRX);
+    ptr->_set_special_func_type(SpecialFuncType::GateRX);
     return ptr;
 }
 DllExport QuantumGateBasic* RY(UINT target_qubit, double rotation_angle) {
     auto ptr = QuantumGateBasic::PauliMatrixGate(
         {target_qubit}, {PAULI_ID_Y}, rotation_angle);
-    ptr->_set_special_func_type(GateRY);
+    ptr->_set_special_func_type(SpecialFuncType::GateRY);
     return ptr;
 }
 DllExport QuantumGateBasic* RZ(UINT target_qubit, double rotation_angle) {
     auto ptr = QuantumGateBasic::PauliMatrixGate(
         {target_qubit}, {PAULI_ID_Z}, rotation_angle);
-    ptr->_set_special_func_type(GateRZ);
+    ptr->_set_special_func_type(SpecialFuncType::GateRZ);
     return ptr;
 }
 DllExport QuantumGateBasic* H(UINT target_qubit) {
@@ -349,7 +349,7 @@ DllExport QuantumGateBasic* H(UINT target_qubit) {
     ComplexMatrix mat(2, 2);
     mat << invsqrt2, invsqrt2, invsqrt2, -invsqrt2;
     auto ptr = QuantumGateBasic::DenseMatrixGate({target_qubit}, mat, {});
-    ptr->_set_special_func_type(GateH);
+    ptr->_set_special_func_type(SpecialFuncType::GateH);
     return ptr;
 }
 DllExport QuantumGateBasic* S(UINT target_qubit) {
@@ -357,7 +357,7 @@ DllExport QuantumGateBasic* S(UINT target_qubit) {
     mat << 1., 0., 0., 1.i;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateS);
+    ptr->_set_special_func_type(SpecialFuncType::GateS);
     return ptr;
 }
 DllExport QuantumGateBasic* HS(UINT target_qubit) {
@@ -372,7 +372,7 @@ DllExport QuantumGateBasic* Sdag(UINT target_qubit) {
     mat << 1., 0., 0., -1.i;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateSdag);
+    ptr->_set_special_func_type(SpecialFuncType::GateSdag);
     return ptr;
 }
 DllExport QuantumGateBasic* T(UINT target_qubit) {
@@ -380,7 +380,7 @@ DllExport QuantumGateBasic* T(UINT target_qubit) {
     mat << 1., 0., 0., (1. + 1.i) / sqrt(2.);
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateT);
+    ptr->_set_special_func_type(SpecialFuncType::GateT);
     return ptr;
 }
 DllExport QuantumGateBasic* Tdag(UINT target_qubit) {
@@ -388,7 +388,7 @@ DllExport QuantumGateBasic* Tdag(UINT target_qubit) {
     mat << 1., 0., 0., (1. - 1.i) / sqrt(2.);
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateTdag);
+    ptr->_set_special_func_type(SpecialFuncType::GateTdag);
     return ptr;
 }
 DllExport QuantumGateBasic* P0(UINT target_qubit) {
@@ -396,7 +396,7 @@ DllExport QuantumGateBasic* P0(UINT target_qubit) {
     mat << 1., 0., 0., 0;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateP0);
+    ptr->_set_special_func_type(SpecialFuncType::GateP0);
     return ptr;
 }
 DllExport QuantumGateBasic* P1(UINT target_qubit) {
@@ -404,7 +404,7 @@ DllExport QuantumGateBasic* P1(UINT target_qubit) {
     mat << 0., 0., 0., 1;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
-    ptr->_set_special_func_type(GateP1);
+    ptr->_set_special_func_type(SpecialFuncType::GateP1);
     return ptr;
 }
 DllExport QuantumGateBasic* CX(UINT control_qubit, UINT target_qubit) {
@@ -413,7 +413,7 @@ DllExport QuantumGateBasic* CX(UINT control_qubit, UINT target_qubit) {
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_X});
     ptr->add_control_qubit(control_qubit, 1);
-    ptr->_set_special_func_type(GateCX);
+    ptr->_set_special_func_type(SpecialFuncType::GateCX);
     return ptr;
 }
 DllExport QuantumGateBasic* CNOT(UINT control_qubit, UINT target_qubit) {
@@ -425,7 +425,7 @@ DllExport QuantumGateBasic* CY(UINT control_qubit, UINT target_qubit) {
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Y});
     ptr->add_control_qubit(control_qubit, 1);
-    ptr->_set_special_func_type(GateCY);
+    ptr->_set_special_func_type(SpecialFuncType::GateCY);
     return ptr;
 }
 DllExport QuantumGateBasic* CZ(UINT control_qubit, UINT target_qubit) {
@@ -434,7 +434,7 @@ DllExport QuantumGateBasic* CZ(UINT control_qubit, UINT target_qubit) {
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit}, mat, {FLAG_COMMUTE_Z});
     ptr->add_control_qubit(control_qubit, 1);
-    ptr->_set_special_func_type(GateCZ);
+    ptr->_set_special_func_type(SpecialFuncType::GateCZ);
     return ptr;
 }
 DllExport QuantumGateBasic* SWAP(UINT target_qubit1, UINT target_qubit2) {
@@ -442,7 +442,7 @@ DllExport QuantumGateBasic* SWAP(UINT target_qubit1, UINT target_qubit2) {
     mat << 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1;
     auto ptr = QuantumGateBasic::DenseMatrixGate(
         {target_qubit1, target_qubit2}, mat, {});
-    ptr->_set_special_func_type(GateSWAP);
+    ptr->_set_special_func_type(SpecialFuncType::GateSWAP);
     return ptr;
 }
 DllExport QuantumGateBasic* ISWAP(UINT target_qubit1, UINT target_qubit2) {

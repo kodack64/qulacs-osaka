@@ -23,21 +23,21 @@ NoiseSimulator::NoiseSimulator(
         initial_state = init_state->copy();
     }
     circuit = init_circuit->copy();
-    for (int i = 0; i < circuit->get_gate_list().size(); ++i) {
+    for (size_t i = 0; i < circuit->get_gate_list().size(); ++i) {
         auto gate = circuit->get_gate_list()[i];
-        if (gate->get_map_type() != Probabilistic) continue;
+        if (gate->get_map_type() != MapType::Probabilistic) continue;
 
         // generate new gate & output it.
         std::vector<double> cumulative_distribution =
             gate->get_cumulative_distribution();
         std::vector<double> distribution;
-        for (int i = 1; i < cumulative_distribution.size(); ++i) {
+        for (size_t i = 1; i < cumulative_distribution.size(); ++i) {
             distribution.push_back(
                 cumulative_distribution[i] - cumulative_distribution[i - 1]);
         }
         std::vector<QuantumGateBase*> Kraus_list = gate->get_kraus_list();
         std::vector<std::tuple<double, int, QuantumGateBase*>> dist_Kraus;
-        for (int i = 0; i < distribution.size(); ++i) {
+        for (size_t i = 0; i < distribution.size(); ++i) {
             dist_Kraus.push_back(std::make_tuple(distribution[i], i,
                 Kraus_list[i]));  // determine 2 same
                                   // distribution gate order using i.
@@ -70,7 +70,7 @@ std::vector<UINT> NoiseSimulator::execute(const UINT sample_count) {
         UINT gate_size = (UINT)circuit->get_gate_list().size();
         for (UINT q = 0; q < gate_size; ++q) {
             auto gate = circuit->get_gate_list()[q];
-            if (gate->get_map_type() != Probabilistic) continue;
+            if (gate->get_map_type() != MapType::Probabilistic) continue;
             double val = random.uniform();
             std::vector<double> itr = gate->get_cumulative_distribution();
             auto hoge = std::lower_bound(itr.begin(), itr.end(), val);
@@ -116,7 +116,7 @@ std::vector<UINT> NoiseSimulator::execute(const UINT sample_count) {
         std::vector<UINT> trial = sampling_required[i].first;
         while (done_itr < trial.size() && trial[done_itr] == 0) {
             auto gate = circuit->get_gate_list()[done_itr];
-            if (gate->get_map_type() != Probabilistic) {
+            if (gate->get_map_type() != MapType::Probabilistic) {
                 gate->update_quantum_state(&Common_state);
             } else {
                 gate->get_kraus_list()[trial[done_itr]]->update_quantum_state(
@@ -149,7 +149,7 @@ void NoiseSimulator::evaluate_gates(const std::vector<UINT> chosen_gate,
     UINT gate_size = (UINT)circuit->get_gate_list().size();
     for (UINT q = StartPos; q < gate_size; ++q) {
         auto gate = circuit->get_gate_list()[q];
-        if (gate->get_map_type() != Probabilistic) {
+        if (gate->get_map_type() != MapType::Probabilistic) {
             gate->update_quantum_state(sampling_state);
         } else {
             gate->get_kraus_list()[chosen_gate[q]]->update_quantum_state(

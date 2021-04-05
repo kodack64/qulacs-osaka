@@ -78,7 +78,7 @@ public:
 
     virtual CPPCTYPE get_expectation_value(
         const QuantumStateBase* state) const {
-        if (state->get_device_type() == DEVICE_CPU) {
+        if (state->get_device_type() == DeviceType::Cpu) {
             if (state->is_state_vector()) {
                 return expectation_value_multi_qubit_Pauli_operator_partial_list(
                     this->_target_index.data(), this->_pauli_id.data(),
@@ -90,7 +90,7 @@ public:
                     (UINT)this->_target_index.size(), state->data_c(),
                     state->dim);
             }
-        } else if (state->get_device_type() == DEVICE_GPU) {
+        } else if (state->get_device_type() == DeviceType::Gpu) {
 #ifdef _USE_GPU
             if (state->is_state_vector()) {
                 return expectation_value_multi_qubit_Pauli_operator_partial_list_host(
@@ -119,7 +119,7 @@ public:
         if (state_bra->dim != state_ket->dim)
             throw std::invalid_argument("state_bra->dim != state_ket->dim");
 
-        if (state_bra->get_device_type() == DEVICE_CPU) {
+        if (state_bra->get_device_type() == DeviceType::Cpu) {
             if (state_bra->is_state_vector()) {
                 return transition_amplitude_multi_qubit_Pauli_operator_partial_list(
                     this->_target_index.data(), this->_pauli_id.data(),
@@ -129,7 +129,7 @@ public:
                 throw std::invalid_argument(
                     "TransitionAmplitude for density matrix is not implemtend");
             }
-        } else if (state_bra->get_device_type() == DEVICE_GPU) {
+        } else if (state_bra->get_device_type() == DeviceType::Gpu) {
 #ifdef _USE_GPU
             if (state_bra->is_state_vector()) {
                 return transition_amplitude_multi_qubit_Pauli_operator_partial_list_host(

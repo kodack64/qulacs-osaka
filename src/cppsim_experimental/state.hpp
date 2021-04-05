@@ -13,7 +13,7 @@
 #include "type.hpp"
 #include "utility.hpp"
 
-enum DeviceType { DEVICE_CPU, DEVICE_GPU };
+enum class DeviceType { Cpu, Gpu };
 
 /**
  * \~japanese-en 量子状態の基底クラス
@@ -453,7 +453,7 @@ public:
         }
 
         this->_classical_register = _state->classical_register;
-        if (_state->get_device_type() == DEVICE_GPU) {
+        if (_state->get_device_type() == DeviceType::Gpu) {
             auto ptr = _state->duplicate_data_cpp();
             memcpy(this->data_cpp(), ptr, (size_t)(sizeof(CPPCTYPE) * _dim));
             free(ptr);
@@ -484,7 +484,9 @@ public:
      * \~japanese-en
      * 量子状態が配置されているメモリを保持するデバイス名を取得する。
      */
-    virtual DeviceType get_device_type() const override { return DEVICE_CPU; }
+    virtual DeviceType get_device_type() const override {
+        return DeviceType::Cpu;
+    }
 
     /**
      * \~japanese-en 量子状態のポインタをvoid*型として返す
@@ -524,7 +526,7 @@ public:
      * \~japanese-en 量子状態を足しこむ
      */
     virtual void add_state(const QuantumStateBase* state) override {
-        if (state->get_device_type() == DEVICE_GPU) {
+        if (state->get_device_type() == DeviceType::Gpu) {
             throw std::invalid_argument(
                 "add state is not supported in gpu device");
         }

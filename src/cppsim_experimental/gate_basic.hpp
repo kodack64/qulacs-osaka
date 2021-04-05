@@ -29,7 +29,7 @@ public:
         const std::vector<UINT>& target_qubit_commutation,
         const std::vector<UINT>& control_qubit_index,
         const std::vector<UINT>& control_qubit_value)
-        : QuantumGateBase(Basic),
+        : QuantumGateBase(MapType::Basic),
           _matrix_type(matrix_type),
           _special_func_type(special_func_type),
           _gate_property(gate_property) {
@@ -169,8 +169,8 @@ public:
             throw std::invalid_argument("matrix.cols() != dim");
         if ((unsigned)matrix.rows() != dim)
             throw std::invalid_argument("matrix.rows() != dim");
-        auto ptr = new QuantumGateBasic(
-            DenseMatrix, None, 0, target_qubit, target_commute, {}, {});
+        auto ptr = new QuantumGateBasic(GateMatrixType::DenseMatrix,
+            SpecialFuncType::None, 0, target_qubit, target_commute, {}, {});
         ptr->_dense_matrix_element = matrix;
         return ptr;
     }
@@ -180,7 +180,8 @@ public:
         ITYPE dim = 1ULL << target_qubit.size();
         if ((unsigned)diagonal_vector.size() != dim)
             throw std::invalid_argument("diagonal_vector.size() != dim");
-        auto ptr = new QuantumGateBasic(DiagonalMatrix, None, 0, target_qubit,
+        auto ptr = new QuantumGateBasic(GateMatrixType::DiagonalMatrix,
+            SpecialFuncType::None, 0, target_qubit,
             std::vector<UINT>(FLAG_COMMUTE_Z, (UINT)target_qubit.size()), {},
             {});
         ptr->_diagonal_matrix_element = diagonal_vector;
@@ -195,8 +196,8 @@ public:
             throw std::invalid_argument("sparse_matrix.cols() != dim");
         if ((unsigned)sparse_matrix.rows() != dim)
             throw std::invalid_argument("sparse_matrix.rows() != dim");
-        auto ptr = new QuantumGateBasic(
-            SparseMatrix, None, 0, target_qubit, target_commute, {}, {});
+        auto ptr = new QuantumGateBasic(GateMatrixType::SparseMatrix,
+            SpecialFuncType::None, 0, target_qubit, target_commute, {}, {});
         ptr->_sparse_matrix_element = sparse_matrix;
         return ptr;
     }
@@ -222,8 +223,8 @@ public:
                     "pauli_id contains a value >= 4. ID must be any of "
                     "(I,X,Y,Z) = (0,1,2,3).");
         }
-        auto ptr = new QuantumGateBasic(
-            PauliMatrix, None, 0, target_qubit, target_commute, {}, {});
+        auto ptr = new QuantumGateBasic(GateMatrixType::PauliMatrix,
+            SpecialFuncType::None, 0, target_qubit, target_commute, {}, {});
         ptr->_rotation_angle = rotation_angle;
         ptr->_pauli_id = pauli_id;
         return ptr;
@@ -233,7 +234,7 @@ public:
         this->_special_func_type = special_func_type;
     }
     virtual void add_control_qubit(UINT control_index, UINT control_value) {
-        if (_matrix_type != DenseMatrix) {
+        if (_matrix_type != GateMatrixType::DenseMatrix) {
             throw std::invalid_argument(
                 "Cannot call add_control_qubit to gate other than "
                 "DenseMatrixGate");
@@ -254,11 +255,11 @@ public:
     }
 
     virtual void multiply_scalar(CPPCTYPE value) {
-        if (_matrix_type == DenseMatrix)
+        if (_matrix_type == GateMatrixType::DenseMatrix)
             _dense_matrix_element *= value;
-        else if (_matrix_type == SparseMatrix)
+        else if (_matrix_type == GateMatrixType::SparseMatrix)
             _sparse_matrix_element *= value;
-        else if (_matrix_type == DiagonalMatrix)
+        else if (_matrix_type == GateMatrixType::DiagonalMatrix)
             _diagonal_matrix_element *= value;
         else
             throw std::invalid_argument("This gate cannot multiply scalar");
@@ -276,16 +277,16 @@ public:
 #endif
 
     void update_quantum_state(QuantumStateBase* state) override {
-        if (state->get_device_type() == DEVICE_CPU) {
+        if (state->get_device_type() == DeviceType::Cpu) {
             if (state->is_state_vector()) {
-                if (_special_func_type == None)
+                if (_special_func_type == SpecialFuncType::None)
                     this->_update_state_vector_cpu_general(state);
                 else
                     this->_update_state_vector_cpu_special(state);
             } else {
                 this->_update_density_matrix_cpu_general(state);
             }
-        } else if (state->get_device_type() == DEVICE_GPU) {
+        } else if (state->get_device_type() == DeviceType::Gpu) {
 #ifdef _USE_GPU
             if (state->is_state_vector()) {
                 this->_update_state_vector_gpu(state);
@@ -303,19 +304,19 @@ public:
     };
 
     virtual void to_dense_matrix() {
-        this->_matrix_type = DenseMatrix;
-        this->_special_func_type = None;
+        this->_matrix_type = GateMatrixType::DenseMatrix;
+        this->_special_func_type = SpecialFuncType::None;
         this->get_target_matrix(this->_dense_matrix_element);
     }
 
     virtual void get_target_matrix(ComplexMatrix& matrix) const {
-        if (_matrix_type == DenseMatrix) {
+        if (_matrix_type == GateMatrixType::DenseMatrix) {
             matrix = this->_dense_matrix_element;
-        } else if (_matrix_type == SparseMatrix) {
+        } else if (_matrix_type == GateMatrixType::SparseMatrix) {
             matrix = this->_sparse_matrix_element.toDense();
-        } else if (_matrix_type == DiagonalMatrix) {
+        } else if (_matrix_type == GateMatrixType::DiagonalMatrix) {
             matrix = this->_diagonal_matrix_element.asDiagonal();
-        } else if (_matrix_type == PauliMatrix) {
+        } else if (_matrix_type == GateMatrixType::PauliMatrix) {
             ComplexMatrix pauli_matrix;
             get_Pauli_matrix(pauli_matrix, this->_pauli_id);
             ITYPE dim = 1ULL << this->_pauli_id.size();
@@ -341,25 +342,25 @@ public:
         ss << "parameter list" << std::endl;
         for (auto item : _parameter) ss << item.first << "," << std::endl;
         switch (_matrix_type) {
-            case DenseMatrix:
+            case GateMatrixType::DenseMatrix:
                 ss << "Dense Matrix" << std::endl;
                 ss << _dense_matrix_element << std::endl;
                 break;
-            case SparseMatrix:
+            case GateMatrixType::SparseMatrix:
                 ss << "Sparse Matrix" << std::endl;
                 ss << _sparse_matrix_element << std::endl;
                 break;
-            case DiagonalMatrix:
+            case GateMatrixType::DiagonalMatrix:
                 ss << "Diagonal Matrix" << std::endl;
                 ss << _diagonal_matrix_element << std::endl;
                 break;
-            case PauliMatrix:
+            case GateMatrixType::PauliMatrix:
                 ss << "Pauli Matrix" << std::endl;
                 ss << "pauli string" << std::endl;
                 for (auto item : _pauli_id) ss << item << "," << std::endl;
                 ss << "rotation angle: " << _rotation_angle << std::endl;
                 break;
-            case PermutationMatrix:
+            case GateMatrixType::PermutationMatrix:
                 ss << "Permutation Matrix" << std::endl;
                 break;
             default:

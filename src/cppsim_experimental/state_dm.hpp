@@ -205,7 +205,7 @@ public:
             */
         }
         if (_state->is_state_vector()) {
-            if (_state->get_device_type() == DEVICE_GPU) {
+            if (_state->get_device_type() == DeviceType::Gpu) {
                 auto ptr = _state->duplicate_data_c();
                 dm_initialize_with_pure_state(this->data_c(), ptr, dim);
                 free(ptr);
@@ -288,7 +288,9 @@ public:
      * \~japanese-en
      * 量子状態が配置されているメモリを保持するデバイス名を取得する。
      */
-    virtual DeviceType get_device_type() const override { return DEVICE_CPU; }
+    virtual DeviceType get_device_type() const override {
+        return DeviceType::Cpu;
+    }
 
     /**
      * \~japanese-en 量子状態のポインタをvoid*型として返す

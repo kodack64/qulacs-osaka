@@ -177,7 +177,7 @@ public:
      * \~japanese-en <code>state</code>の量子状態を自身へコピーする。
      */
     virtual void load(const QuantumStateBase* _state) override {
-        if (_state->get_device_type() == DEVICE_GPU) {
+        if (_state->get_device_type() == Gpu) {
             copy_quantum_state_from_device_to_device(
                 this->data(), _state->data(), dim, _cuda_stream, device_number);
         } else {
@@ -205,7 +205,7 @@ public:
      * \~japanese-en
      * 量子状態が配置されているメモリを保持するデバイス名を取得する。
      */
-    virtual DeviceType get_device_type() const override { return DEVICE_GPU; }
+    virtual DeviceType get_device_type() const override { return Gpu; }
 
     /**
      * \~japanese-en

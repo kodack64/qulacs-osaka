@@ -1,4 +1,4 @@
-﻿#include <algorithm>
+#include <algorithm>
 #include <chrono>
 #include <csim/init_ops.hpp>
 #include <csim/memory_ops.hpp>
