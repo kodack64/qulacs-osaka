@@ -10,6 +10,8 @@
 #include "state.hpp"
 #include "type.hpp"
 
+#pragma omp declare reduction(* : CPPCTYPE : omp_out *= omp_in) initializer (omp_priv = 1)
+
 CPPCTYPE Observable::calc_coef(
     const MultiQubitPauliOperator& a, const MultiQubitPauliOperator& b) const {
     auto x_a = a.get_x_bits();
@@ -26,6 +28,7 @@ CPPCTYPE Observable::calc_coef(
     CPPCTYPE res = 1.0;
     CPPCTYPE I = 1.0i;
     ITYPE i;
+#pragma omp parallel for reduction(* : res)
     for (i = 0; i < x_a.size(); i++) {
         if (x_a[i] && !z_a[i]) {            // a = X
             if (!x_b[i] && z_b[i]) {        // b = Z
