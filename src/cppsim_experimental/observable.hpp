@@ -15,18 +15,20 @@
 #include "pauli_operator.hpp"
 #include "state.hpp"
 #include "type.hpp"
+#include "lockedHash.hpp"
 
 class DllExport Observable {
 private:
     std::vector<MultiQubitPauliOperator> _pauli_terms;
     std::vector<CPPCTYPE> _coef_list;
     std::unordered_map<std::string, ITYPE> _term_dict;
+    lockedHash<std::string, ITYPE> _term_lockedHash;
 
     CPPCTYPE calc_coef(const MultiQubitPauliOperator& a,
         const MultiQubitPauliOperator& b) const;
 
 public:
-    Observable(){};
+    Observable() : _term_lockedHash(omp_sync_hint_speculative){};
 
     /**
      * Observable が保持する PauliOperator の個数を返す

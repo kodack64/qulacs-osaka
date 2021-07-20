@@ -67,13 +67,12 @@ void Observable::add_term(const CPPCTYPE coef, MultiQubitPauliOperator op) {
     this->_coef_list.push_back(coef);
     this->_pauli_terms.push_back(op);
     this->_term_dict[op.to_string()] = _coef_list.size() - 1;
+    this->_term_lockedHash.insert(op.to_string(), _coef_list.size() - 1);
 }
 
 void Observable::add_term(const CPPCTYPE coef, std::string s) {
     MultiQubitPauliOperator op(s);
-    this->_coef_list.push_back(coef);
-    this->_pauli_terms.push_back(op);
-    this->_term_dict[op.to_string()] = _coef_list.size() - 1;
+    add_term(coef, op);
 }
 
 void Observable::remove_term(UINT index) {
