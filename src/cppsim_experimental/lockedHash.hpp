@@ -11,7 +11,7 @@ class DllExport lockedHash {
     omp_lock_t theLock;
 
 public:
-    lockedHash(omp_sync_hint_t hint) {
+    lockedHash(omp_lock_hint_t hint) {
         omp_init_lock_with_hint(&theLock, hint);
     }
     void insert(T key, V value) {

@@ -28,7 +28,7 @@ private:
         const MultiQubitPauliOperator& b) const;
 
 public:
-    Observable() : _term_lockedHash(omp_sync_hint_speculative){};
+    Observable() : _term_lockedHash(omp_lock_hint_speculative){};
 
     /**
      * Observable が保持する PauliOperator の個数を返す
