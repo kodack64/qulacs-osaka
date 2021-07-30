@@ -22,13 +22,12 @@ private:
     std::vector<MultiQubitPauliOperator> _pauli_terms;
     std::vector<CPPCTYPE> _coef_list;
     std::unordered_map<std::string, ITYPE> _term_dict;
-    lockedHash<std::string, ITYPE> _term_lockedHash;
 
     CPPCTYPE calc_coef(const MultiQubitPauliOperator& a,
         const MultiQubitPauliOperator& b) const;
 
 public:
-    Observable() : _term_lockedHash(omp_lock_hint_speculative){};
+    Observable(){};
 
     /**
      * Observable が保持する PauliOperator の個数を返す
