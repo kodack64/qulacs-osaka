@@ -9,6 +9,8 @@
 #include <csim/constant.hpp>
 #include <fstream>
 
+#include <chrono>
+
 #include "../util/util.hpp"
 
 TEST(ObservableTest, CheckExpectationValue) {
@@ -145,6 +147,69 @@ TEST(ObservableTest, calc_coefTest){
     Observable ZY = Z * Y;
     EXPECT_EQ(-1i, ZY.get_term(0).first);
     EXPECT_EQ(PAULI_ID_X, ZY.get_term(0).second.get_pauli_id_list().at(0));
+}
+
+TEST(ObservableTest, CopyTest){
+    Observable ob;
+    Observable res;
+    
+    for(int i=0; i< 100; i++){
+        for(int j=0; j < 6; j++){
+            int base = i*36 + j * 6;
+            ob.add_term(1.0, 
+                "X " + std::to_string(base) +
+                " Y " + std::to_string(base + 1) + 
+                " Z " + std::to_string(base + 2) +
+                " X " + std::to_string(base + 3) +
+                " Y " + std::to_string(base + 4) +
+                " Z " + std::to_string(base + 5)
+            );
+        }
+        for(int j=0; j < ob.get_term_count(); j++){
+            res.add_term(ob.get_term(j).first, ob.get_term(j).second);
+        }
+    }
+    auto start = std::chrono::system_clock::now();
+    Observable res_copy = *res.copy();
+    auto end = std::chrono::system_clock::now();
+    auto dur = end - start;        // 要した時間を計算
+    auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+    // 要した時間をミリ秒（1/1000秒）に変換して表示
+    std::cout << msec << " milli sec \n";
+    std::cout << "res_copy term count: " << res_copy.get_term_count() << std::endl;
+    std::cout << "res_copy dict size: " << res_copy.get_dict().size() << std::endl;
+}
+
+TEST(ObservableTest, CopyTest1){
+    Observable ob;
+    Observable res;
+
+    for(int i=0; i< 100; i++){
+        for(int j=0; j < 6; j++){
+            int base = i*36 + j * 6;
+            ob.add_term(1.0, 
+                "X " + std::to_string(base) +
+                " Y " + std::to_string(base + 1) + 
+                " Z " + std::to_string(base + 2) +
+                " X " + std::to_string(base + 3) +
+                " Y " + std::to_string(base + 4) +
+                " Z " + std::to_string(base + 5)
+            );
+        }
+        for(int j=0; j < ob.get_term_count(); j++){
+            res.add_term(ob.get_term(j).first, ob.get_term(j).second);
+        }
+    }
+
+    auto start = std::chrono::system_clock::now();
+    Observable res_copy = *res.copy1();
+    auto end = std::chrono::system_clock::now();
+    auto dur = end - start;        // 要した時間を計算
+    auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+    // 要した時間をミリ秒（1/1000秒）に変換して表示
+    std::cout << msec << " milli sec \n";
+    std::cout << "res_copy term count: " << res_copy.get_term_count() << std::endl;
+    std::cout << "res_copy dict size: " << res_copy.get_dict().size() << std::endl;
 }
 
 /*
