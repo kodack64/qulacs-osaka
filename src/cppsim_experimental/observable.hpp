@@ -15,7 +15,6 @@
 #include "pauli_operator.hpp"
 #include "state.hpp"
 #include "type.hpp"
-#include "lockedHash.hpp"
 
 class DllExport Observable {
 private:
