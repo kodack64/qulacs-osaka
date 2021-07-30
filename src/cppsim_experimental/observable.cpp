@@ -11,6 +11,7 @@
 #include "type.hpp"
 
 #pragma omp declare reduction(* : CPPCTYPE : omp_out *= omp_in) initializer (omp_priv = 1)
+#pragma omp declare reduction(merge : std::unordered_map<std::string, ITYPE> : omp_out.insert(omp_in.begin(), omp_in.end()))
 
 CPPCTYPE Observable::calc_coef(
     const MultiQubitPauliOperator& a, const MultiQubitPauliOperator& b) const {
@@ -74,6 +75,24 @@ void Observable::add_term(const CPPCTYPE coef, std::string s) {
     add_term(coef, op);
 }
 
+void Observable::add_term(const std::vector<CPPCTYPE> coef_list, std::vector<MultiQubitPauliOperator> pauli_terms){
+    int base_size = this->_coef_list.size();
+    int changed_size = base_size + coef_list.size();
+    // 予めvectorのメモリを確保しておくことで、indexでアクセス出来るようにする
+    this->_coef_list.resize(changed_size);
+    this->_pauli_terms.resize(changed_size);
+
+#pragma omp parallel for reduction(merge : _term_dict)
+    for(ITYPE index=0; index < coef_list.size(); index++){
+        int insert_pos = base_size + index;
+        this->_coef_list[insert_pos] = coef_list[index];
+        this->_pauli_terms[insert_pos] = pauli_terms[index];
+        // for文内では、term_dictは各スレッドでprivateな変数になっている
+        // for文が終了後、各スレッドのterm_dictがreductionされる
+        this->_term_dict[pauli_terms[index].to_string()] = insert_pos;
+    }
+}
+
 void Observable::remove_term(UINT index) {
     this->_coef_list.erase(this->_coef_list.begin() + index);
     this->_pauli_terms.erase(this->_pauli_terms.begin() + index);
@@ -106,6 +125,13 @@ Observable* Observable::copy() const {
     for (i = 0; i < this->_coef_list.size(); i++) {
         res->add_term(this->_coef_list[i], *this->_pauli_terms[i].copy());
     }
+    return res;
+}
+
+Observable* Observable::copy1() const {
+    Observable* res = new Observable();
+    // add_termに、vectorのまま渡すやつを用意した
+    res->add_term(this->_coef_list, this->_pauli_terms);
     return res;
 }
 

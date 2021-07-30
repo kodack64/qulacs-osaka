@@ -66,6 +66,8 @@ public:
      */
     void add_term(const CPPCTYPE coef, std::string s);
 
+    void add_term(const std::vector<CPPCTYPE> coef_list, std::vector<MultiQubitPauliOperator> _pauli_terms);
+
     void remove_term(UINT index);
 
     /**
@@ -92,6 +94,7 @@ public:
      * @return ヒープに確保した Observable へのポインタ
      */
     Observable* copy() const;
+    Observable* copy1() const;
 
     Observable operator+(const Observable& target) const;
 
