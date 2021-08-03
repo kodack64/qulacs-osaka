@@ -59,6 +59,8 @@ jobs:
         run: |
           cd ./build
           make test -j
+          pip list
+          python -c "import cirq; print(cirq.Qid)"
           make pythontest -j
         if: ${{ contains(matrix.os, 'macos') }}
 
