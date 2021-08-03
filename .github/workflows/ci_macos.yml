@@ -34,6 +34,7 @@ jobs:
           pip install -U --only-binary=numpy,scipy numpy scipy openfermion
           pip list
           python -c "import cirq; print(cirq); print(cirq.__file__); print(cirq.__path__);"
+          echo "cirq dir: " && ls /Users/runner/hostedtoolcache/Python/3.7.5/x64/lib/python3.7/site-packages/cirq
           python -c "import cirq; print(cirq.Qid)"
 
       - name: Workaround for OpenMP link error on mac
