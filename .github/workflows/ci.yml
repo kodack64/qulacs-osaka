@@ -36,7 +36,6 @@ jobs:
           pip install --no-deps --force-reinstall cirq cirq-core cirq-google
           pip list
           python -c "import cirq; print(cirq); print(cirq.__file__); print(cirq.__path__);"
-          echo "cirq dir: " && ls /Users/runner/hostedtoolcache/Python/3.7.5/x64/lib/python3.7/site-packages/cirq
           python -c "import cirq; print(cirq.Qid)"
 
       - name: Install qulacs for Windows
