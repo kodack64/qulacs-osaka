@@ -33,8 +33,7 @@ jobs:
         run: | 
           pip install -U --only-binary=numpy,scipy numpy scipy openfermion
           pip list
-          python -c "import cirq; print(cirq)"
-          python -c 'import cirq; print(cirq.google.Foxtail)'
+          python -c "import cirq; print(cirq); print(cirq.__file__); print(cirq.__path__);"
           python -c "import cirq; print(cirq.Qid)"
 
       - name: Workaround for OpenMP link error on mac
