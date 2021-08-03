@@ -10,9 +10,6 @@
 #include "state.hpp"
 #include "type.hpp"
 
-#pragma omp declare reduction(* : CPPCTYPE : omp_out *= omp_in) initializer (omp_priv = 1)
-#pragma omp declare reduction(merge : std::unordered_map<std::string, ITYPE> : omp_out.insert(omp_in.begin(), omp_in.end()))
-
 CPPCTYPE Observable::calc_coef(
     const MultiQubitPauliOperator& a, const MultiQubitPauliOperator& b) const {
     auto x_a = a.get_x_bits();
@@ -29,27 +26,36 @@ CPPCTYPE Observable::calc_coef(
     CPPCTYPE res = 1.0;
     CPPCTYPE I = 1.0i;
     ITYPE i;
-#pragma omp parallel for reduction(* : res)
-    for (i = 0; i < x_a.size(); i++) {
-        if (x_a[i] && !z_a[i]) {            // a = X
-            if (!x_b[i] && z_b[i]) {        // b = Z
-                res *= -I;                  // XZ = -iY
-            } else if (x_b[i] && z_b[i]) {  // b = Y
-                res *= I;                   // XY = iZ
-            }
-        } else if (!x_a[i] && z_a[i]) {     // a = Z
-            if (x_b[i] && !z_b[i]) {        // b = X
-                res *= I;                   // ZX = iY
-            } else if (x_b[i] && z_b[i]) {  // b = Y
-                res *= -I;                  // ZY = -iX
-            }
-        } else if (x_a[i] && z_a[i]) {       // a = Y
-            if (x_b[i] && !z_b[i]) {         // b = X
-                res *= -I;                   // YX = -iZ
-            } else if (!x_b[i] && z_b[i]) {  // b = Z
-                res *= I;                    // YZ = iX
+#pragma omp parallel
+    {
+        // 各スレッドごとに変数を用意する
+        CPPCTYPE res_private = 1.0;
+#pragma omp for nowait
+        for (i = 0; i < x_a.size(); i++) {
+            if (x_a[i] && !z_a[i]) {            // a = X
+                if (!x_b[i] && z_b[i]) {        // b = Z
+                    res_private *= -I;          // XZ = -iY
+                } else if (x_b[i] && z_b[i]) {  // b = Y
+                    res_private *= I;           // XY = iZ
+                }
+            } else if (!x_a[i] && z_a[i]) {     // a = Z
+                if (x_b[i] && !z_b[i]) {        // b = X
+                    res_private *= I;           // ZX = iY
+                } else if (x_b[i] && z_b[i]) {  // b = Y
+                    res_private *= -I;          // ZY = -iX
+                }
+            } else if (x_a[i] && z_a[i]) {       // a = Y
+                if (x_b[i] && !z_b[i]) {         // b = X
+                    res_private *= -I;           // YX = -iZ
+                } else if (!x_b[i] && z_b[i]) {  // b = Z
+                    res_private *= I;            // YZ = iX
+                }
             }
         }
+
+#pragma omp critical
+        // 一つのスレッドで計算した結果を全て合わせていく
+        { res *= res_private; }
     }
     return res;
 }
@@ -82,14 +88,25 @@ void Observable::add_term(const std::vector<CPPCTYPE> coef_list, std::vector<Mul
     this->_coef_list.resize(changed_size);
     this->_pauli_terms.resize(changed_size);
 
-#pragma omp parallel for reduction(merge : _term_dict)
-    for(ITYPE index=0; index < coef_list.size(); index++){
-        int insert_pos = base_size + index;
-        this->_coef_list[insert_pos] = coef_list[index];
-        this->_pauli_terms[insert_pos] = pauli_terms[index];
-        // for文内では、term_dictは各スレッドでprivateな変数になっている
-        // for文が終了後、各スレッドのterm_dictがreductionされる
-        this->_term_dict[pauli_terms[index].to_string()] = insert_pos;
+#pragma omp parallel
+    {
+        // 各スレッドでprivateな変数を用意する
+        std::unordered_map<std::string, ITYPE> term_dict_private;
+#pragma omp for nowait
+        for (ITYPE index = 0; index < coef_list.size(); index++) {
+            int insert_pos = base_size + index;
+            this->_coef_list[insert_pos] = coef_list[index];
+            this->_pauli_terms[insert_pos] = pauli_terms[index];
+            // dictには並列で同時に書き込めないので、一旦term_dict_privateに書き込む
+            term_dict_private[pauli_terms[index].to_string()] = insert_pos;
+        }
+
+#pragma omp critical
+        // 一つのスレッドで計算した結果を全て合わせていく
+        {
+            _term_dict.insert(
+                term_dict_private.begin(), term_dict_private.end());
+        }
     }
 }
 
