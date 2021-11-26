@@ -70,8 +70,8 @@ jobs:
       - name: Show cache stats
         run: ccache -s
 
-  nvcc-gcc8-GPUbuild:
-    name: nvcc + gcc8 build
+  nvcc-gcc10-GPUbuild:
+    name: nvcc + gcc10 build
     runs-on: "ubuntu-20.04"
     env:
       CXX_COMPILER: "/usr/lib/ccache/g++"
@@ -116,7 +116,7 @@ jobs:
 
   source-dist:
     name: Source dist
-    needs: gcc8-build
+    needs: gcc10-build
     strategy:
       matrix:
         python-version: ["3.7.5"]
@@ -149,7 +149,7 @@ jobs:
 
   source-dist-gpu:
     name: Source dist (Qulacs-GPU)
-    needs: gcc8-build
+    needs: gcc10-build
     strategy:
       matrix:
         python-version: ["3.7.5"]
