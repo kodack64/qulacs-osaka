@@ -5,15 +5,15 @@ on:
   pull_request:
 
 jobs:
-  gcc8-build:
-    name: GCC8 build
+  gcc10-build:
+    name: GCC10 build
     strategy:
       matrix:
         python-version: ["3.7.5"]
     runs-on: "windows-2019"
     env:
-      CXX_COMPILER: "g++-8"
-      C_COMPILER: "gcc-8"
+      CXX_COMPILER: "g++-10"
+      C_COMPILER: "gcc-10"
       PYTHON: ${{ matrix.python-version }}
       COVERAGE: "ON"
     steps:
