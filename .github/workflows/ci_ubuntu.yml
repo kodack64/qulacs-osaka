@@ -20,6 +20,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup cmake
+        uses: lukka/get-cmake@latest
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - name: Install ccache
+        run: sudo apt install ccache
+
+      - name: Setup cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}
+
       - name: check gcc version
         run: |
           /usr/lib/ccache/g++ --version
@@ -27,23 +45,6 @@ jobs:
           which g++
           which gcc
 
-#      - name: Setup cmake
-#        uses: lukka/get-cmake@latest
-#
-#      - name: Setup Python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: ${{ matrix.python-version }}
-#          architecture: x64
-#
-#      - name: Install ccache
-#        run: sudo apt install ccache
-#
-#      - name: Setup cache
-#        uses: actions/cache@v2
-#        with:
-#          path: ~/.ccache
-#          key: ${{ runner.os }}-${{ env.CACHE_NAME }}
 #
 #      - name: Install boost
 #        run: sudo apt install libboost-dev
